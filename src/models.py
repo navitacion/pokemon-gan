@@ -12,17 +12,27 @@ class Generator(nn.Module):
             nn.ReLU(inplace=True))
 
         self.layer2 = nn.Sequential(
-            nn.ConvTranspose2d(image_size * 8, image_size * 4, kernel_size=6, stride=4, padding=1),
+            nn.ConvTranspose2d(image_size * 8, image_size * 4, kernel_size=6, stride=2, padding=1),
             nn.BatchNorm2d(image_size * 4),
             nn.ReLU(inplace=True))
 
         self.layer3 = nn.Sequential(
-            nn.ConvTranspose2d(image_size * 4, image_size * 2, kernel_size=6, stride=4, padding=1),
+            nn.ConvTranspose2d(image_size * 4, image_size * 2, kernel_size=6, stride=2, padding=1),
             nn.BatchNorm2d(image_size * 2),
             nn.ReLU(inplace=True))
 
         self.layer4 = nn.Sequential(
             nn.ConvTranspose2d(image_size * 2, image_size, kernel_size=4, stride=2, padding=1),
+            nn.BatchNorm2d(image_size),
+            nn.ReLU(inplace=True))
+
+        self.layer5 = nn.Sequential(
+            nn.ConvTranspose2d(image_size, image_size, kernel_size=4, stride=2, padding=1),
+            nn.BatchNorm2d(image_size),
+            nn.ReLU(inplace=True))
+
+        self.layer6 = nn.Sequential(
+            nn.ConvTranspose2d(image_size, image_size, kernel_size=4, stride=2, padding=1),
             nn.BatchNorm2d(image_size),
             nn.ReLU(inplace=True))
 
@@ -35,6 +45,8 @@ class Generator(nn.Module):
         out = self.layer2(out)
         out = self.layer3(out)
         out = self.layer4(out)
+        out = self.layer5(out)
+        out = self.layer6(out)
         out = self.last(out)
 
         return out
@@ -46,23 +58,25 @@ class Discriminator(nn.Module):
         super(Discriminator, self).__init__()
 
         self.layer1 = nn.Sequential(
-            nn.Conv2d(3, image_size, kernel_size=4, stride=2, padding=1),
+            nn.Conv2d(3, image_size, kernel_size=5, stride=2, padding=1),
             nn.LeakyReLU(0.1, inplace=True))
         # 注意：白黒画像なので入力チャネルは1つだけ
 
         self.layer2 = nn.Sequential(
-            nn.Conv2d(image_size, image_size*2, kernel_size=6, stride=4, padding=1),
+            nn.Conv2d(image_size, image_size*2, kernel_size=3, stride=4, padding=1),
             nn.LeakyReLU(0.1, inplace=True))
 
         self.layer3 = nn.Sequential(
-            nn.Conv2d(image_size*2, image_size*4, kernel_size=4, stride=4, padding=1),
+            nn.Conv2d(image_size*2, image_size*4, kernel_size=3, stride=4, padding=1),
             nn.LeakyReLU(0.1, inplace=True))
 
         self.layer4 = nn.Sequential(
-            nn.Conv2d(image_size*4, image_size*8, kernel_size=4, stride=2, padding=1),
+            nn.Conv2d(image_size*4, image_size*8, kernel_size=3, stride=2, padding=1),
             nn.LeakyReLU(0.1, inplace=True))
 
-        self.last = nn.Conv2d(image_size*8, 1, kernel_size=4, stride=1)
+        self.last = nn.Sequential(
+            nn.Conv2d(image_size*8, 1, kernel_size=3, stride=1),
+            nn.AdaptiveAvgPool2d((1, 1)))
 
     def forward(self, x):
         out = self.layer1(x)
@@ -70,5 +84,6 @@ class Discriminator(nn.Module):
         out = self.layer3(out)
         out = self.layer4(out)
         out = self.last(out)
+        out = out.squeeze()
 
         return out

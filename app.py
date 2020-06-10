@@ -15,19 +15,7 @@ from src import utils, models
 BATCH_SIZE = 8
 Z_DIM = 20
 
-
-
 st.title('Pokemon GAN')
-
-data_path = './data/pokemon/pokemon'
-
-# img_path = os.path.join(data_path, '3.png')
-#
-# img = Image.open(img_path)
-# img = np.array(img)
-
-# st.subheader('3.png')
-# st.image(img, caption='Fushigibana', use_column_width=True)
 
 seed = st.slider('Seed', min_value=0, max_value=100)
 torch.manual_seed(seed)
@@ -36,6 +24,7 @@ weight_path = ''
 
 fixed_z = torch.randn(BATCH_SIZE, Z_DIM, 1, 1)
 G = models.Generator(z_dim=20, image_size=256)
+D = models.Discriminator(image_size=256)
 device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
 
 if weight_path != '':

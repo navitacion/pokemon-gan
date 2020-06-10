@@ -12,37 +12,56 @@ import streamlit as st
 from src import utils, models
 
 
-st.title('Pokemon')
+BATCH_SIZE = 8
+Z_DIM = 20
+
+
+
+st.title('Pokemon GAN')
 
 data_path = './data/pokemon/pokemon'
 
-img_path = os.path.join(data_path, '3.png')
-
-img = Image.open(img_path)
-img = np.array(img)
+# img_path = os.path.join(data_path, '3.png')
+#
+# img = Image.open(img_path)
+# img = np.array(img)
 
 # st.subheader('3.png')
 # st.image(img, caption='Fushigibana', use_column_width=True)
 
+seed = st.slider('Seed', min_value=0, max_value=100)
+torch.manual_seed(seed)
 
-genre = st.radio("What's", ('Comedy', 'Drame', 'Documentary'))
+weight_path = ''
 
-if genre == 'Comedy':
-    st.text('You selected comdey')
-else:
-    st.write('fff')
-
-
+fixed_z = torch.randn(BATCH_SIZE, Z_DIM, 1, 1)
 G = models.Generator(z_dim=20, image_size=256)
-D = models.Discriminator(z_dim=20, image_size=256)
+device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
 
-input_z = torch.randn(1, 20, 1, 1)
-fake_images = G(input_z)
-d_out = D(fake_images)
-d_out = nn.Sigmoid()(d_out)
+if weight_path != '':
+    G.load_state_dict(torch.load(weight_path, map_location=device))
 
-print(d_out)
-print(d_out.size())
+
+fig, axes = plt.subplots(ncols=4, nrows=2)
+
+d_out = G(fixed_z)
+
+for i, ax in enumerate(axes.ravel()):
+    out = d_out[i]
+    out = out.detach().permute(1, 2, 0).numpy()
+
+    # Reverse Normalize
+    _max, _min = out.max(), out.min()
+    out = (out - _min) * 255 / (_max - _min)
+    out = out.astype(int)
+
+    ax.imshow(out)
+    ax.axis('off')
+
+plt.tight_layout()
+
+st.subheader('Generative')
+st.pyplot()
 
 # img_transform = fake_images[0].detach().permute(1, 2, 0).numpy()
 #

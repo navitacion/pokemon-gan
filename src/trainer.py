@@ -40,6 +40,8 @@ def train_model(G, D, dataloader, num_epochs):
     iteration = 1
     logs = []
 
+    best_loss = 1e+9
+
     # epochのループ
     for epoch in range(num_epochs):
 
@@ -69,8 +71,8 @@ def train_model(G, D, dataloader, num_epochs):
             # 正解ラベルと偽ラベルを作成
             # epochの最後のイテレーションはミニバッチの数が少なくなる
             mini_batch_size = imges.size()[0]
-            label_real = torch.full((mini_batch_size,), 1).to(device)
-            label_fake = torch.full((mini_batch_size,), 0).to(device)
+            label_real = torch.full((mini_batch_size,), 1, dtype=torch.float).to(device)
+            label_fake = torch.full((mini_batch_size,), 0, dtype=torch.float).to(device)
 
             # 真の画像を判定
             d_out_real = D(imges)
@@ -125,5 +127,9 @@ def train_model(G, D, dataloader, num_epochs):
             epoch, epoch_d_loss/batch_size, epoch_g_loss/batch_size))
         print('timer:  {:.4f} sec.'.format(t_epoch_finish - t_epoch_start))
         t_epoch_start = time.time()
+
+
+        if epoch_g_loss < best_loss:
+            torch.save(G.state_dict(), f'../weights/generator_epoch_{epoch+1}.pth')
 
     return G, D

@@ -1,6 +1,7 @@
 import time
 import torch
 from torch import nn
+from tqdm import tqdm
 
 
 def train_model(G, D, dataloader, num_epochs):
@@ -56,7 +57,7 @@ def train_model(G, D, dataloader, num_epochs):
         print('（train）')
 
         # データローダーからminibatchずつ取り出すループ
-        for imges in dataloader:
+        for imges in tqdm(dataloader):
 
             # --------------------
             # 1. Discriminatorの学習

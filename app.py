@@ -13,11 +13,11 @@ from src import models
 
 
 BATCH_SIZE = 8
-Z_DIM = 20
+Z_DIM = 80
 
 st.title('Pokemon GAN')
 
-epoch = st.slider('Epoch', min_value=0, max_value=5)
+epoch = st.slider('Epoch', min_value=0, max_value=100)
 # torch.manual_seed(seed)
 device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
 
@@ -29,7 +29,8 @@ def model_init(weight_path):
     return G
 
 
-weight_path = f'./weights/netG_epoch_{epoch}.pth'
+exp = 'GAN_01'
+weight_path = f'./weights/{exp}_netG_epoch_{epoch}.pth'
 G = model_init(weight_path)
 
 fixed_z = torch.randn(BATCH_SIZE, Z_DIM, 1, 1)

@@ -1,8 +1,7 @@
 from PIL import Image
 
-import torch
-from torch import nn, optim
-from torch.utils.data import Dataset, DataLoader
+from torch import nn
+from torch.utils.data import Dataset
 from torchvision import transforms
 
 

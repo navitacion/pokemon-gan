@@ -21,7 +21,6 @@ def train_model(G, D, dataloader, num_epochs):
 
     # パラメータをハードコーディング
     z_dim = 20
-    mini_batch_size = dataloader.batch_size
 
     # ネットワークをGPUへ
     G.to(device)
@@ -34,12 +33,10 @@ def train_model(G, D, dataloader, num_epochs):
     torch.backends.cudnn.benchmark = True
 
     # 画像の枚数
-    num_train_imgs = len(dataloader.dataset)
     batch_size = dataloader.batch_size
 
     # イテレーションカウンタをセット
     iteration = 1
-    logs = []
 
     best_loss = 1e+9
 
@@ -127,10 +124,9 @@ def train_model(G, D, dataloader, num_epochs):
         print('epoch {} || Epoch_D_Loss:{:.4f} ||Epoch_G_Loss:{:.4f}'.format(
             epoch, epoch_d_loss/batch_size, epoch_g_loss/batch_size))
         print('timer:  {:.4f} sec.'.format(t_epoch_finish - t_epoch_start))
-        t_epoch_start = time.time()
-
 
         if epoch_g_loss < best_loss:
             torch.save(G.state_dict(), f'../weights/generator_epoch_{epoch+1}.pth')
+            best_loss = epoch_g_loss
 
     return G, D

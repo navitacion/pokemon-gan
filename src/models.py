@@ -42,7 +42,7 @@ class Generator(nn.Module):
 
 class Discriminator(nn.Module):
 
-    def __init__(self, z_dim=20, image_size=64):
+    def __init__(self, image_size=64):
         super(Discriminator, self).__init__()
 
         self.layer1 = nn.Sequential(

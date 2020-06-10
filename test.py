@@ -14,7 +14,7 @@ dataset = utils.PokemonDataset(img_path=img_path, transform=transform)
 dataloader = DataLoader(dataset, batch_size=16, shuffle=True)
 
 G = models.Generator(z_dim=20, image_size=256)
-D = models.Discriminator(z_dim=20, image_size=256)
+D = models.Discriminator(image_size=256)
 
 G.apply(utils.weights_init)
 D.apply(utils.weights_init)

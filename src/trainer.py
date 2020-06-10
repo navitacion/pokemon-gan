@@ -1,14 +1,19 @@
+import os
 import time
 import torch
 from torch import nn
 from tqdm import tqdm
 
+from tensorboardX import SummaryWriter
 
-def train_model(G, D, dataloader, num_epochs):
 
+def train_model(G, D, dataloader, num_epochs, save_weights_path, exp='GAN_01', tensorboard_path='./tensorboard'):
+
+    print('Pokemon GAN Training...')
     # GPUが使えるかを確認
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
-    print("使用デバイス：", device)
+    print("Device：", device)
+    writer = SummaryWriter(os.path.join(tensorboard_path, exp))
 
     # 最適化手法の設定
     g_lr, d_lr = 0.0001, 0.0004
@@ -38,8 +43,6 @@ def train_model(G, D, dataloader, num_epochs):
     # イテレーションカウンタをセット
     iteration = 1
 
-    best_loss = 1e+9
-
     # epochのループ
     for epoch in range(num_epochs):
 
@@ -48,13 +51,8 @@ def train_model(G, D, dataloader, num_epochs):
         epoch_g_loss = 0.0  # epochの損失和
         epoch_d_loss = 0.0  # epochの損失和
 
-        print('-------------')
-        print('Epoch {}/{}'.format(epoch, num_epochs))
-        print('-------------')
-        print('（train）')
-
         # データローダーからminibatchずつ取り出すループ
-        for imges in tqdm(dataloader):
+        for imges in dataloader:
 
             # --------------------
             # 1. Discriminatorの学習
@@ -118,15 +116,15 @@ def train_model(G, D, dataloader, num_epochs):
             epoch_g_loss += g_loss.item()
             iteration += 1
 
-        # epochのphaseごとのlossと正解率
-        t_epoch_finish = time.time()
-        print('-------------')
-        print('epoch {} || Epoch_D_Loss:{:.4f} ||Epoch_G_Loss:{:.4f}'.format(
-            epoch, epoch_d_loss/batch_size, epoch_g_loss/batch_size))
-        print('timer:  {:.4f} sec.'.format(t_epoch_finish - t_epoch_start))
+        D_loss = epoch_d_loss/batch_size
+        G_loss = epoch_g_loss/batch_size
 
-        if epoch_g_loss < best_loss:
-            torch.save(G.state_dict(), f'../weights/generator_epoch_{epoch+1}.pth')
-            best_loss = epoch_g_loss
+        writer.add_scalar('netD_loss', D_loss, epoch)
+        writer.add_scalar('netG_loss', G_loss, epoch)
+
+        torch.save(G.state_dict(), os.path.join(save_weights_path, f'{exp}_netG_epoch_{epoch}.pth'))
+        torch.save(D.state_dict(), os.path.join(save_weights_path, f'{exp}_netD_epoch_{epoch}.pth'))
+
+    writer.close()
 
     return G, D

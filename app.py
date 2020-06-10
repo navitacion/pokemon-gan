@@ -9,7 +9,7 @@ import torch
 from torch import nn, optim
 import streamlit as st
 
-from src import utils, models
+from src import models
 
 
 BATCH_SIZE = 8
@@ -17,26 +17,29 @@ Z_DIM = 20
 
 st.title('Pokemon GAN')
 
-seed = st.slider('Seed', min_value=0, max_value=100)
-torch.manual_seed(seed)
-
-weight_path = ''
-
-fixed_z = torch.randn(BATCH_SIZE, Z_DIM, 1, 1)
-G = models.Generator(z_dim=20, image_size=256)
-D = models.Discriminator(image_size=256)
+epoch = st.slider('Epoch', min_value=0, max_value=5)
+# torch.manual_seed(seed)
 device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
 
-if weight_path != '':
+
+@st.cache
+def model_init(weight_path):
+    G = models.Generator(z_dim=20, image_size=256)
     G.load_state_dict(torch.load(weight_path, map_location=device))
+    return G
 
 
-fig, axes = plt.subplots(ncols=4, nrows=2)
+weight_path = f'./weights/netG_epoch_{epoch}.pth'
+G = model_init(weight_path)
 
+fixed_z = torch.randn(BATCH_SIZE, Z_DIM, 1, 1)
 d_out = G(fixed_z)
 
+fig, axes = plt.subplots(ncols=4, nrows=2)
 for i, ax in enumerate(axes.ravel()):
-    out = d_out[i]
+    input_z = torch.randn(1, Z_DIM, 1, 1)
+    d_out = G(input_z)
+    out = d_out[0]
     out = out.detach().permute(1, 2, 0).numpy()
 
     # Reverse Normalize

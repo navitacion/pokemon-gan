@@ -12,26 +12,34 @@ import streamlit as st
 from src import models
 
 
-BATCH_SIZE = 8
-Z_DIM = 80
-
-st.title('Pokemon GAN')
-
-epoch = st.slider('Epoch', min_value=0, max_value=500, step=10)
-# torch.manual_seed(seed)
-device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
-
-
 @st.cache
-def model_init(weight_path):
-    G = models.Generator_64(z_dim=Z_DIM, image_size=64)
+def model_init(weight_path, exp):
+    if 'SAGAN' in exp:
+        G = models.Generator_sagan(z_dim=Z_DIM, image_size=64)
+    else:
+        G = models.Generator(z_dim=Z_DIM, image_size=64)
     G.load_state_dict(torch.load(weight_path, map_location=device))
     return G
 
 
-exp = 'GAN_01'
+BATCH_SIZE = 8
+Z_DIM = 500
+
+st.title('Pokemon GAN')
+
+exp = st.selectbox('Select Exp', ('GAN_01', 'SAGAN_01'))
+
+# if exp == 'GAN_01':
+#     Z_DIM = 80
+# elif exp == 'SAGAN_01':
+#     Z_DIM = 500
+
+epoch = st.slider('Epoch', min_value=0, max_value=5000, step=50)
+device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
+
+
 weight_path = f'./weights/{exp}_netG_epoch_{epoch}.pth'
-G = model_init(weight_path)
+G = model_init(weight_path, exp)
 
 fixed_z = torch.randn(BATCH_SIZE, Z_DIM, 1, 1)
 d_out = G(fixed_z)

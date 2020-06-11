@@ -6,7 +6,7 @@ from torch import nn
 from tensorboardX import SummaryWriter
 
 
-def train_model(G, D, dataloader, num_epochs, save_weights_path, exp='GAN_01', tensorboard_path='./tensorboard'):
+def train_model(G, D, dataloader, z_dim, num_epochs, save_weights_path, exp='GAN_01', tensorboard_path='./tensorboard'):
 
     print('Pokemon GAN Training...')
     # GPUが使えるかを確認
@@ -15,16 +15,13 @@ def train_model(G, D, dataloader, num_epochs, save_weights_path, exp='GAN_01', t
     writer = SummaryWriter(os.path.join(tensorboard_path, exp))
 
     # 最適化手法の設定
-    g_lr, d_lr = 5e-5, 2e-4
+    g_lr, d_lr = 1e-4, 4e-4
     beta1, beta2 = 0.0, 0.9
     g_optimizer = torch.optim.Adam(G.parameters(), g_lr, (beta1, beta2))
     d_optimizer = torch.optim.Adam(D.parameters(), d_lr, (beta1, beta2))
 
     # 誤差関数を定義
     criterion = nn.BCEWithLogitsLoss(reduction='mean')
-
-    # パラメータをハードコーディング
-    z_dim = 20
 
     # ネットワークをGPUへ
     G.to(device)
@@ -118,11 +115,12 @@ def train_model(G, D, dataloader, num_epochs, save_weights_path, exp='GAN_01', t
         D_loss = epoch_d_loss/batch_size
         G_loss = epoch_g_loss/batch_size
 
-        writer.add_scalar('netD_loss', D_loss, epoch)
-        writer.add_scalar('netG_loss', G_loss, epoch)
+        writer.add_scalar('loss/netD', D_loss, epoch)
+        writer.add_scalar('loss/netG', G_loss, epoch)
 
-        torch.save(G.state_dict(), os.path.join(save_weights_path, f'{exp}_netG_epoch_{epoch}.pth'))
-        torch.save(D.state_dict(), os.path.join(save_weights_path, f'{exp}_netD_epoch_{epoch}.pth'))
+        if epoch % 10 == 0:
+            torch.save(G.state_dict(), os.path.join(save_weights_path, f'{exp}_netG_epoch_{epoch}.pth'))
+            torch.save(D.state_dict(), os.path.join(save_weights_path, f'{exp}_netD_epoch_{epoch}.pth'))
 
     writer.close()
 

@@ -17,14 +17,14 @@ Z_DIM = 80
 
 st.title('Pokemon GAN')
 
-epoch = st.slider('Epoch', min_value=0, max_value=100)
+epoch = st.slider('Epoch', min_value=0, max_value=500, step=10)
 # torch.manual_seed(seed)
 device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
 
 
 @st.cache
 def model_init(weight_path):
-    G = models.Generator(z_dim=20, image_size=256)
+    G = models.Generator_64(z_dim=Z_DIM, image_size=64)
     G.load_state_dict(torch.load(weight_path, map_location=device))
     return G
 
@@ -36,7 +36,7 @@ G = model_init(weight_path)
 fixed_z = torch.randn(BATCH_SIZE, Z_DIM, 1, 1)
 d_out = G(fixed_z)
 
-fig, axes = plt.subplots(ncols=4, nrows=2)
+fig, axes = plt.subplots(ncols=5, nrows=4, figsize=(16, 16))
 for i, ax in enumerate(axes.ravel()):
     input_z = torch.randn(1, Z_DIM, 1, 1)
     d_out = G(input_z)
@@ -46,6 +46,7 @@ for i, ax in enumerate(axes.ravel()):
     # Reverse Normalize
     _max, _min = out.max(), out.min()
     out = (out - _min) * 255 / (_max - _min)
+    # out = out * 0.5 + 0.5
     out = out.astype(int)
 
     ax.imshow(out)
@@ -53,7 +54,7 @@ for i, ax in enumerate(axes.ravel()):
 
 plt.tight_layout()
 
-st.subheader('Generative')
+st.subheader('Generative Pokemon Images')
 st.pyplot()
 
 # img_transform = fake_images[0].detach().permute(1, 2, 0).numpy()

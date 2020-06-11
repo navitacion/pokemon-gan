@@ -1,10 +1,10 @@
 import torch.nn as nn
 import torch
 
-class Generator(nn.Module):
+class Generator_dcgan(nn.Module):
 
     def __init__(self, z_dim=20, image_size=64):
-        super(Generator, self).__init__()
+        super(Generator_dcgan, self).__init__()
 
         self.layer1 = nn.Sequential(
             nn.ConvTranspose2d(z_dim, image_size * 8,
@@ -31,7 +31,7 @@ class Generator(nn.Module):
             nn.ReLU(inplace=True))
 
         self.last = nn.Sequential(
-            nn.ConvTranspose2d(image_size, 3, kernel_size=4,
+            nn.ConvTranspose2d(image_size, 1, kernel_size=4,
                                stride=2, padding=1),
             nn.Tanh())
 
@@ -45,13 +45,13 @@ class Generator(nn.Module):
         return out
 
 
-class Discriminator(nn.Module):
+class Discriminator_dcgan(nn.Module):
 
-    def __init__(self, z_dim=20, image_size=64):
-        super(Discriminator, self).__init__()
+    def __init__(self, image_size=64):
+        super(Discriminator_dcgan, self).__init__()
 
         self.layer1 = nn.Sequential(
-            nn.Conv2d(3, image_size, kernel_size=4,
+            nn.Conv2d(1, image_size, kernel_size=4,
                       stride=2, padding=1),
             nn.LeakyReLU(0.1, inplace=True))
 
@@ -80,7 +80,6 @@ class Discriminator(nn.Module):
         out = self.last(out)
 
         return out
-
 
 
 class Self_Attention(nn.Module):
@@ -177,9 +176,10 @@ class Generator_sagan(nn.Module):
         self.self_attntion2 = Self_Attention(in_dim=image_size)
 
         self.last = nn.Sequential(
-            nn.ConvTranspose2d(image_size, 3, kernel_size=4,
+            nn.ConvTranspose2d(image_size, 1, kernel_size=4,
                                stride=2, padding=1),
             nn.Tanh())
+            # グレースケールのため
 
     def forward(self, z):
         out = self.layer1(z)
@@ -195,14 +195,15 @@ class Generator_sagan(nn.Module):
 
 class Discriminator_sagan(nn.Module):
 
-    def __init__(self, z_dim=20, image_size=64):
+    def __init__(self, image_size=64):
         super(Discriminator_sagan, self).__init__()
 
         self.layer1 = nn.Sequential(
             # Spectral Normalizationを追加
-            nn.utils.spectral_norm(nn.Conv2d(3, image_size, kernel_size=4,
+            nn.utils.spectral_norm(nn.Conv2d(1, image_size, kernel_size=4,
                                              stride=2, padding=1)),
             nn.LeakyReLU(0.1, inplace=True))
+        # グレースケール
 
         self.layer2 = nn.Sequential(
             # Spectral Normalizationを追加

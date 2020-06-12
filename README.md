@@ -50,6 +50,7 @@ poetry run streamlit run app.py
 ## 学習方法
 
 [Pokemon Images Dataset | Kaggle](https://www.kaggle.com/kvpratama/pokemon-images-dataset)
+
 上のURLからデータをダウンロードし、data/pokemonに格納します。
 
 その後、下記を実行します。

@@ -21,7 +21,7 @@ st.title('Pokemon GAN')
 
 exp = st.selectbox('Select GAN', ('DCGAN_01', 'SAGAN_01'))
 
-epoch = st.slider('Select Epoch', min_value=0, max_value=5000, step=100)
+epoch = st.slider('Select Epoch', min_value=0, max_value=5000, step=500)
 device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
 
 weight_path = f'./weights/{exp}_netG_epoch_{epoch}.pth'

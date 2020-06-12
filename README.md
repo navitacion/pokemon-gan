@@ -1,4 +1,4 @@
-# Pokemon GAN APP
+# Pokemon GAN
 
 ## 概要
 
@@ -6,13 +6,11 @@
 
 それぞれの結果をstreamlitを用いてアプリ化した
 
-- - - -
 
 ## 前提
 
-poetryをインストールのこと
+poetryがインストール済み
 
-- - - -
 
 ## 利用方法
 

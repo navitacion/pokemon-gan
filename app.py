@@ -27,7 +27,7 @@ device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
 weight_path = f'./weights/{exp}_netG_epoch_{epoch}.pth'
 G = model_init(weight_path, exp)
 
-fig, axes = plt.subplots(ncols=5, nrows=4, figsize=(16, 16))
+fig, axes = plt.subplots(ncols=5, nrows=3, figsize=(16, 12))
 for i, ax in enumerate(axes.ravel()):
     input_z = torch.randn(1, Z_DIM, 1, 1)
     d_out = G(input_z)  # (1, image_size, image_size, 1)

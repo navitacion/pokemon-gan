@@ -5,8 +5,10 @@ GANを用いて新しいポケモンを生み出すWebアプリです。
 
 DCGAN, SAGANを試してみました。
 
-参考にさせていただきました。
+## 前提
+poetryがインストールされていること
 
+MacあるいはLinuxであること
 
 ## 使用データ
 「Pokemon Images Dataset」（Kaggle Datasetより）
@@ -15,21 +17,17 @@ DCGAN, SAGANを試してみました。
 
 ## 仕様
 
-出力画像：グレースケール・64×64
+出力画像：グレースケール；64×64
 
 モデル：DCGAN, SAGAN
 
 WebアプリではEpoch数0 ~ 5,000回の結果を500ごとに表示できるようにしています。
 
 ## 学習時間
+
 DCGAN：約8時間（5,000 epochs）
 
 SAGAN：約11時間（5,000 epochs）
-
-## 前提
-poetryがインストールされていること
-
-MacあるいはLinuxであること
 
 ## 利用方法
 

@@ -39,9 +39,7 @@ poetry run streamlit run app.py
 
 [Pokemon Images Dataset | Kaggle](https://www.kaggle.com/kvpratama/pokemon-images-dataset)
 
-学習する時は上のURLからデータをダウンロードし、
-
-data/pokemonに格納したのち、下記を実行する
+学習する時は上のURLからデータをダウンロードし、data/pokemonに格納したのち、下記を実行する
 
 ```
 poetry run python train.py

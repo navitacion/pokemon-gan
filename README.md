@@ -16,18 +16,11 @@ MacあるいはLinuxであること
 [Pokemon Images Dataset | Kaggle](https://www.kaggle.com/kvpratama/pokemon-images-dataset)
 
 ## 仕様
-
 出力画像：グレースケール；64×64
 
 モデル：DCGAN, SAGAN
 
 WebアプリではEpoch数0 ~ 5,000回の結果を500ごとに表示できるようにしています。
-
-## 学習時間
-
-DCGAN：約8時間（5,000 epochs）
-
-SAGAN：約11時間（5,000 epochs）
 
 ## 利用方法
 
@@ -48,7 +41,6 @@ poetry run streamlit run app.py
 ```
 
 ## 学習方法
-
 [Pokemon Images Dataset | Kaggle](https://www.kaggle.com/kvpratama/pokemon-images-dataset)
 
 上のURLからデータをダウンロードし、data/pokemonに格納します。

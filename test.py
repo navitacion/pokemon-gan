@@ -5,7 +5,7 @@ from src import models
 
 net = models.Discriminator_dcgan(image_size=64, in_channel=3)
 
-z = torch.randn(1, 3, 256, 256)
+z = torch.randn(1, 3, 128, 128)
 
 out = net(z)
 

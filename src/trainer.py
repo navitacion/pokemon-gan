@@ -8,7 +8,7 @@ from tensorboardX import SummaryWriter
 
 
 def train_model(G, D, dataloader, z_dim, num_epochs, save_weights_path, exp='DCGAN',
-                tensorboard_path='./tensorboard', gan_type='DCGAN'):
+                tensorboard_path='./tensorboard', gan_type='DCGAN', save_weight_epoch=100):
 
     assert gan_type in ['DCGAN', 'SAGAN'], "This Trainer is supported 'DCGAN, SAGAN'"
     print(f'Pokemon {gan_type} Training...')
@@ -135,7 +135,7 @@ def train_model(G, D, dataloader, z_dim, num_epochs, save_weights_path, exp='DCG
         writer.add_scalar('loss/netD', D_loss, epoch)
         writer.add_scalar('loss/netG', G_loss, epoch)
 
-        if epoch % 20 == 0:
+        if epoch % save_weight_epoch == 0:
             torch.save(G.state_dict(), os.path.join(save_weights_path, f'{exp}_netG_epoch_{epoch}.pth'))
             torch.save(D.state_dict(), os.path.join(save_weights_path, f'{exp}_netD_epoch_{epoch}.pth'))
 

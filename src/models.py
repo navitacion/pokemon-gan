@@ -3,7 +3,7 @@ import torch
 
 class Generator_dcgan(nn.Module):
 
-    def __init__(self, z_dim=20, image_size=256, out_channel=1):
+    def __init__(self, z_dim=20, image_size=64, out_channel=1):
         super(Generator_dcgan, self).__init__()
 
         self.layer1 = nn.Sequential(
@@ -25,18 +25,12 @@ class Generator_dcgan(nn.Module):
         )
 
         self.layer4 = nn.Sequential(
-            nn.ConvTranspose2d(image_size * 4, image_size * 4, kernel_size=4, stride=2, padding=1),
-            nn.BatchNorm2d(image_size * 4),
-            nn.ReLU(inplace=True)
-        )
-
-        self.layer5 = nn.Sequential(
             nn.ConvTranspose2d(image_size*4, image_size*2, kernel_size=4, stride=2, padding=1),
             nn.BatchNorm2d(image_size*2),
             nn.ReLU(inplace=True)
         )
 
-        self.layer6 = nn.Sequential(
+        self.layer5 = nn.Sequential(
             nn.ConvTranspose2d(image_size*2, image_size, kernel_size=4, stride=2, padding=1),
             nn.BatchNorm2d(image_size),
             nn.ReLU(inplace=True)
@@ -53,7 +47,6 @@ class Generator_dcgan(nn.Module):
         out = self.layer3(out)
         out = self.layer4(out)
         out = self.layer5(out)
-        out = self.layer6(out)
         out = self.last(out)
 
         return out
@@ -61,7 +54,7 @@ class Generator_dcgan(nn.Module):
 
 class Discriminator_dcgan(nn.Module):
 
-    def __init__(self, image_size=256, in_channel=1):
+    def __init__(self, image_size=64, in_channel=1):
         super(Discriminator_dcgan, self).__init__()
 
         self.layer1 = nn.Sequential(
@@ -80,16 +73,11 @@ class Discriminator_dcgan(nn.Module):
         )
 
         self.layer4 = nn.Sequential(
-            nn.Conv2d(image_size * 2, image_size * 2, kernel_size=4, stride=2, padding=1),
-            nn.LeakyReLU(0.1, inplace=True)
-        )
-
-        self.layer5 = nn.Sequential(
             nn.Conv2d(image_size*2, image_size*4, kernel_size=4, stride=2, padding=1),
             nn.LeakyReLU(0.1, inplace=True)
         )
 
-        self.layer6 = nn.Sequential(
+        self.layer5 = nn.Sequential(
             nn.Conv2d(image_size*4, image_size*8, kernel_size=4, stride=2, padding=1),
             nn.LeakyReLU(0.1, inplace=True)
         )
@@ -102,7 +90,6 @@ class Discriminator_dcgan(nn.Module):
         out = self.layer3(out)
         out = self.layer4(out)
         out = self.layer5(out)
-        out = self.layer6(out)
         out = self.last(out)
 
         return out
@@ -167,24 +154,16 @@ class Generator_sagan(nn.Module):
         self.self_attention1 = Self_Attention(in_dim=image_size*4)
 
         self.layer4 = nn.Sequential(
-            nn.utils.spectral_norm(
-                nn.ConvTranspose2d(image_size*4, image_size*4, kernel_size=4, stride=2, padding=1)),
-            nn.BatchNorm2d(image_size*4),
-            nn.ReLU(inplace=True))
-
-        self.layer5 = nn.Sequential(
             nn.utils.spectral_norm(nn.ConvTranspose2d(image_size*4, image_size*2, kernel_size=4, stride=2, padding=1)),
             nn.BatchNorm2d(image_size*2),
             nn.ReLU(inplace=True))
 
-        self.self_attention2 = Self_Attention(in_dim=image_size*2)
-
-        self.layer6 = nn.Sequential(
+        self.layer5 = nn.Sequential(
             nn.utils.spectral_norm(nn.ConvTranspose2d(image_size*2, image_size, kernel_size=4, stride=2, padding=1)),
             nn.BatchNorm2d(image_size),
             nn.ReLU(inplace=True))
 
-        self.self_attention3 = Self_Attention(in_dim=image_size)
+        self.self_attention2 = Self_Attention(in_dim=image_size)
 
         self.last = nn.Sequential(
             nn.ConvTranspose2d(image_size, out_channel, kernel_size=4,
@@ -195,12 +174,10 @@ class Generator_sagan(nn.Module):
         out = self.layer1(z)
         out = self.layer2(out)
         out = self.layer3(out)
-        out, attension_map1 = self.self_attention1(out)
+        out, attention_map1 = self.self_attention1(out)
         out = self.layer4(out)
         out = self.layer5(out)
         out, attention_map2 = self.self_attention2(out)
-        out = self.layer6(out)
-        out, attention_map3 = self.self_attention3(out)
         out = self.last(out)
 
         return out
@@ -229,23 +206,16 @@ class Discriminator_sagan(nn.Module):
         self.self_attention1 = Self_Attention(in_dim=image_size*2)
 
         self.layer4 = nn.Sequential(
-            nn.utils.spectral_norm(nn.Conv2d(image_size*2, image_size*2, kernel_size=4, stride=2, padding=1)),
-            nn.LeakyReLU(0.1, inplace=True)
-        )
-
-        self.layer5 = nn.Sequential(
             nn.utils.spectral_norm(nn.Conv2d(image_size*2, image_size*4, kernel_size=4, stride=2, padding=1)),
             nn.LeakyReLU(0.1, inplace=True)
         )
 
-        self.self_attention2 = Self_Attention(in_dim=image_size*4)
-
-        self.layer6 = nn.Sequential(
+        self.layer4 = nn.Sequential(
             nn.utils.spectral_norm(nn.Conv2d(image_size*4, image_size*8, kernel_size=4, stride=2, padding=1)),
             nn.LeakyReLU(0.1, inplace=True)
         )
 
-        self.self_attention3 = Self_Attention(in_dim=image_size*8)
+        self.self_attention2 = Self_Attention(in_dim=image_size*8)
 
         self.last = nn.Conv2d(image_size*8, 1, kernel_size=4, stride=1)
 
@@ -256,9 +226,7 @@ class Discriminator_sagan(nn.Module):
         out, attention_map1 = self.self_attention1(out)
         out = self.layer4(out)
         out = self.layer5(out)
-        out, attention_map2 = self.self_attention2(out)
-        out = self.layer6(out)
-        out, attention_map3 = self.self_attention3(out)
+        out, attention_map2 = self.self_attention3(out)
         out = self.last(out)
 
         return out

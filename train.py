@@ -11,6 +11,7 @@ parser.add_argument('-img_s', '--image_size', type=int, default=256)
 parser.add_argument('-epoch', '--epoch', type=int, default=10001)
 parser.add_argument('-gan', '--gan_type', choices=['DCGAN', 'SAGAN'], default='SAGAN')
 parser.add_argument('-exp', '--exp_name')
+parser.add_argument('-s_epoch', '--save_weight_epoch', type=int, default=100)
 
 args = parser.parse_args()
 
@@ -42,5 +43,6 @@ D.apply(utils.weights_init)
 
 # Training  ################################################################
 G, D = trainer.train_model(G, D, dataloader, z_dim=Z_DIM, num_epochs=EPOCHS, save_weights_path='./weights',
-                           tensorboard_path='./tensorboard', exp=args.exp_name, gan_type=args.gan_type)
+                           tensorboard_path='./tensorboard', exp=args.exp_name, gan_type=args.gan_type,
+                           save_weight_epoch=args.save_weight_epoch)
 

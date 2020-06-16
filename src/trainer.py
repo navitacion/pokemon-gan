@@ -7,13 +7,17 @@ from torch import nn
 from tensorboardX import SummaryWriter
 
 
-def train_model(G, D, dataloader, z_dim, num_epochs,
-                save_weights_path, exp='SAGAN_01', tensorboard_path='./tensorboard', gan_type='DCGAN'):
+def train_model(G, D, dataloader, z_dim, num_epochs, save_weights_path, exp='DCGAN',
+                tensorboard_path='./tensorboard', gan_type='DCGAN'):
 
     assert gan_type in ['DCGAN', 'SAGAN'], "This Trainer is supported 'DCGAN, SAGAN'"
     print(f'Pokemon {gan_type} Training...')
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
     print('Device: ', device)
+
+    if not os.path.exists(tensorboard_path):
+        os.mkdir(tensorboard_path)
+
     # Tensorboard
     writer = SummaryWriter(os.path.join(tensorboard_path, exp))
 
@@ -43,7 +47,6 @@ def train_model(G, D, dataloader, z_dim, num_epochs,
     for epoch in tqdm(range(num_epochs)):
 
         # 開始時刻を保存
-        t_epoch_start = time.time()
         epoch_g_loss = 0.0  # epochの損失和
         epoch_d_loss = 0.0  # epochの損失和
 
@@ -132,7 +135,7 @@ def train_model(G, D, dataloader, z_dim, num_epochs,
         writer.add_scalar('loss/netD', D_loss, epoch)
         writer.add_scalar('loss/netG', G_loss, epoch)
 
-        if epoch % 100 == 0:
+        if epoch % 20 == 0:
             torch.save(G.state_dict(), os.path.join(save_weights_path, f'{exp}_netG_epoch_{epoch}.pth'))
             torch.save(D.state_dict(), os.path.join(save_weights_path, f'{exp}_netD_epoch_{epoch}.pth'))
 

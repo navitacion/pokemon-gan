@@ -7,8 +7,8 @@ from src import utils, models, trainer
 # Parser  ################################################################
 parser = argparse.ArgumentParser()
 parser.add_argument('-b', '--batch_size', type=int, default=32)
-parser.add_argument('-img_s', '--image_size', type=int, default=64)
-parser.add_argument('-epoch', '--epoch', type=int, default=5001)
+parser.add_argument('-img_s', '--image_size', type=int, default=256)
+parser.add_argument('-epoch', '--epoch', type=int, default=10001)
 parser.add_argument('-gan', '--gan_type', choices=['DCGAN', 'SAGAN'], default='SAGAN')
 parser.add_argument('-exp', '--exp_name')
 
@@ -18,7 +18,7 @@ args = parser.parse_args()
 MEAN = (0.5,)
 STD = (0.5,)
 EPOCHS = args.epoch
-Z_DIM = 500
+Z_DIM = 100
 BATCHSIZE = args.batch_size
 IMGSIZE = args.image_size
 
@@ -31,11 +31,11 @@ dataloader = DataLoader(dataset, batch_size=BATCHSIZE, shuffle=True)
 # Model  ################################################################
 
 if args.gan_type == 'DCGAN':
-    G = models.Generator_dcgan(z_dim=Z_DIM, image_size=64)
-    D = models.Discriminator_dcgan(image_size=64)
+    G = models.Generator_dcgan(z_dim=Z_DIM, image_size=64, out_channel=3)
+    D = models.Discriminator_dcgan(image_size=64, in_channel=3)
 elif args.gan_type == 'SAGAN':
-    G = models.Generator_sagan(z_dim=Z_DIM, image_size=64)
-    D = models.Discriminator_sagan(image_size=64)
+    G = models.Generator_sagan(z_dim=Z_DIM, image_size=64, out_channel=3)
+    D = models.Discriminator_sagan(image_size=64, in_channel=3)
 
 G.apply(utils.weights_init)
 D.apply(utils.weights_init)

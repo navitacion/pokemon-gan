@@ -33,7 +33,6 @@ class ImageTransform:
             transforms.Resize((img_size, img_size)),
             transforms.RandomHorizontalFlip(),
             transforms.RandomVerticalFlip(),
-            transforms.Grayscale(),
             transforms.ToTensor(),
             transforms.Normalize(mean, std)
         ])

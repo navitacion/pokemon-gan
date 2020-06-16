@@ -1,1 +1,5 @@
 /.venv/*
+poetry.lock
+pyproject.toml
+/data/*
+/weights/*

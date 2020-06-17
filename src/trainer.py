@@ -7,8 +7,35 @@ from torch import nn
 from tensorboardX import SummaryWriter
 
 
-def train_model(G, D, dataloader, z_dim, num_epochs, save_weights_path, exp='DCGAN',
+# 学習メモ
+# DCGAN: batch_size=64  Epoch 1000  2h20m
+# SAGAN: batch_size=16  Epoch 1000
+
+
+def train_model(G, D, dataloader, z_dim, num_epochs, save_weights_path='./weights',
                 tensorboard_path='./tensorboard', gan_type='DCGAN', save_weight_epoch=100):
+    """
+    モデル学習のヘルパー関数
+
+    Parameters
+    ----------
+    G : torch.nn.Modulue
+        生成モデル
+    D : torch.nn.Module
+        識別モデル
+    dataloader: torch.utils.data.DataLoader
+        データローダー
+    num_epochs: int
+        最大エポック数
+    save_weights_path: str
+        学習モデルの重み保存先ディレクトリ
+    tensorboard_path: str
+        tensorboardのログ出力先ディレクトリ
+    gan_type: str
+        学習するGANのタイプ（DCGAN, SAGAN）
+    save_weight_epoch: int
+        重みを保存するタイミング
+    """
 
     assert gan_type in ['DCGAN', 'SAGAN'], "This Trainer is supported 'DCGAN, SAGAN'"
     print(f'Pokemon {gan_type} Training...')
@@ -19,10 +46,14 @@ def train_model(G, D, dataloader, z_dim, num_epochs, save_weights_path, exp='DCG
         os.mkdir(tensorboard_path)
 
     # Tensorboard
-    writer = SummaryWriter(os.path.join(tensorboard_path, exp))
+    writer = SummaryWriter(os.path.join(tensorboard_path, gan_type))
 
     # 最適化手法の設定
-    g_lr, d_lr = 0.0002, 0.0002
+    g_lr, d_lr = 0, 0
+    if gan_type == 'DCGAN':
+        g_lr, d_lr = 0.0002, 0.0002
+    elif gan_type == 'SAGAN':
+        g_lr, d_lr = 0.0001, 0.0004
     beta1, beta2 = 0.0, 0.9
     g_optimizer = torch.optim.Adam(G.parameters(), g_lr, (beta1, beta2))
     d_optimizer = torch.optim.Adam(D.parameters(), d_lr, (beta1, beta2))
@@ -34,8 +65,8 @@ def train_model(G, D, dataloader, z_dim, num_epochs, save_weights_path, exp='DCG
     G.to(device)
     D.to(device)
 
-    G.train()  # モデルを訓練モードに
-    D.train()  # モデルを訓練モードに
+    G.train()
+    D.train()
 
     # 画像の枚数
     batch_size = dataloader.batch_size
@@ -46,11 +77,10 @@ def train_model(G, D, dataloader, z_dim, num_epochs, save_weights_path, exp='DCG
     # epochのループ
     for epoch in tqdm(range(num_epochs)):
 
-        # 開始時刻を保存
-        epoch_g_loss = 0.0  # epochの損失和
-        epoch_d_loss = 0.0  # epochの損失和
+        # Epoch Lossの初期化
+        epoch_g_loss = 0.0
+        epoch_d_loss = 0.0
 
-        # データローダーからminibatchずつ取り出すループ
         for imges in dataloader:
 
             # --------------------
@@ -60,11 +90,7 @@ def train_model(G, D, dataloader, z_dim, num_epochs, save_weights_path, exp='DCG
             if imges.size()[0] == 1:
                 continue
 
-            # GPUが使えるならGPUにデータを送る
             imges = imges.to(device)
-
-            # 正解ラベルと偽ラベルを作成
-            # epochの最後のイテレーションはミニバッチの数が少なくなる
             mini_batch_size = imges.size()[0]
 
             # 真の画像を判定
@@ -75,14 +101,16 @@ def train_model(G, D, dataloader, z_dim, num_epochs, save_weights_path, exp='DCG
             fake_images = G(input_z)
             d_out_fake = D(fake_images)
 
-            # Loss
+            # Batch Lossの初期化
             d_loss_real, d_loss_fake = 0, 0
 
             # BCEWithLogitsLoss
             if gan_type == 'DCGAN':
                 label_real = torch.full((mini_batch_size,), 1, dtype=torch.float).to(device)
                 label_fake = torch.full((mini_batch_size,), 0, dtype=torch.float).to(device)
+                # 真の画像を真と判定する
                 d_loss_real = criterion(d_out_real.view(-1), label_real)
+                # 偽の画像を偽と判定する
                 d_loss_fake = criterion(d_out_fake.view(-1), label_fake)
 
             # hinge version of the adversarial loss
@@ -106,11 +134,12 @@ def train_model(G, D, dataloader, z_dim, num_epochs, save_weights_path, exp='DCG
             fake_images = G(input_z)
             d_out_fake = D(fake_images)
 
-            # Loss
+            # Batch Lossの初期化
             g_loss = 0
             # BCEWithLogitsLoss
             if gan_type == 'DCGAN':
                 label_real = torch.full((mini_batch_size,), 1, dtype=torch.float).to(device)
+                # 偽の画像を真と判定する
                 g_loss = criterion(d_out_fake.view(-1), label_real)
 
             # hinge version of the adversarial loss
@@ -122,21 +151,21 @@ def train_model(G, D, dataloader, z_dim, num_epochs, save_weights_path, exp='DCG
             g_loss.backward()
             g_optimizer.step()
 
-            # --------------------
-            # 3. 記録
-            # --------------------
+            # Epoch Lossの更新
             epoch_d_loss += d_loss.item()
             epoch_g_loss += g_loss.item()
+            # イテレーションカウンタの更新
             iteration += 1
 
+        # Epoch Lossの平均を算出
         D_loss = epoch_d_loss / batch_size
         G_loss = epoch_g_loss / batch_size
 
+        # Tensorboardへの書き出し
         writer.add_scalar('loss/netD', D_loss, epoch)
         writer.add_scalar('loss/netG', G_loss, epoch)
 
+        # save_weight_epochで定義したタイミングでモデルの重みを保存
         if epoch % save_weight_epoch == 0:
-            torch.save(G.state_dict(), os.path.join(save_weights_path, f'{exp}_netG_epoch_{epoch}.pth'))
-            torch.save(D.state_dict(), os.path.join(save_weights_path, f'{exp}_netD_epoch_{epoch}.pth'))
-
-    return G, D
+            torch.save(G.state_dict(), os.path.join(save_weights_path, f'{gan_type}_netG_epoch_{epoch}.pth'))
+            torch.save(D.state_dict(), os.path.join(save_weights_path, f'{gan_type}_netD_epoch_{epoch}.pth'))

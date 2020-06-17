@@ -32,6 +32,8 @@ class ImageTransform:
         self.transform = transforms.Compose([
             transforms.Resize((img_size, img_size)),
             transforms.CenterCrop(img_size),
+            transforms.RandomHorizontalFlip(),
+            transforms.RandomVerticalFlip(),
             transforms.ToTensor(),
             transforms.Normalize(mean, std)
         ])

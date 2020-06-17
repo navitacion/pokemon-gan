@@ -1,49 +1,80 @@
+import numpy as np
 import matplotlib.pyplot as plt
 import torch
 import streamlit as st
+import torchvision.utils as vutils
 
 from src import models
 
-
+# グローバル変数
 Z_DIM = 400
+OUTPUT_IMAGE_NUM = 20
+device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
 
+
+# モデルの初期化関数
 @st.cache
 def model_init(weight_path, exp):
+    """
+    モデルの初期化関数
+
+    Parameters
+    ----------
+    weight_path : str
+        学習済みモデルの重みのパス
+    exp : str
+        モデルの種類（DCGAN, SAGAN）
+
+    Returns
+    -------
+    G : torch.nn.Module
+        学習済みモデル
+    """
+
     if 'DCGAN' in exp:
         G = models.Generator_dcgan(z_dim=Z_DIM, image_size=64, out_channel=3)
     elif 'SAGAN' in exp:
         G = models.Generator_sagan(z_dim=Z_DIM, image_size=64, out_channel=3)
     G.load_state_dict(torch.load(weight_path, map_location=device))
+
     return G
 
 
-st.title('Pokemon GAN')
+# タイトルとディスクリプションの設定
+st.title('Pokémon GAN')
+st.markdown('---')
+st.markdown('This app is a demo of GAN using Pokémon images.')
+st.markdown('In this demo, the DCGAN and SAGAN models can be used to generate images.')
+st.markdown('By selecting the type of model and the number of training epochs, '
+            'you can select the model and the degree of training '
+            'according to the You can see the results of the GAN output.')
+st.markdown('Enjoy!!!')
+st.markdown('---')
 
-exp = st.selectbox('Select GAN', ('DCGAN', 'SAGAN'))
+# スライドバーの設定
+st.sidebar.subheader('Setup')
+exp = st.sidebar.selectbox('Select GAN', ('DCGAN', 'SAGAN'))
+epoch = st.sidebar.slider('Select Epoch', min_value=0, max_value=1000, step=20)
 
-epoch = st.slider('Select Epoch', min_value=0, max_value=5000, step=100)
-device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
-
+# モデルの準備
 weight_path = f'./weights/{exp}_netG_epoch_{epoch}.pth'
 G = model_init(weight_path, exp)
 
-fig, axes = plt.subplots(ncols=5, nrows=3, figsize=(16, 12))
-for i, ax in enumerate(axes.ravel()):
-    input_z = torch.randn(1, Z_DIM, 1, 1)
-    d_out = G(input_z)  # (1, channel, image_size, image_size)
-    out = d_out[0].permute(1, 2, 0)  # (image_size, image_size, channel)
-    out = out.detach().numpy()
+# 画像生成
+z = torch.randn(OUTPUT_IMAGE_NUM, Z_DIM, 1, 1)
+out = G(z)
 
-    # Reverse Normalize
-    out = out * 0.5 + 0.5
-    # _max, _min = out.max(), out.min()
-    # out = (out - _min) * 255 / (_max - _min)
-    # out = out.astype(int)
+# 複数画像を一つに結合
+img = vutils.make_grid(out.detach().cpu(), normalize=True, padding=2, nrow=5, pad_value=1)
+img = np.transpose(img.numpy(), [1, 2, 0])
 
-    ax.imshow(out)
-    ax.axis('off')
-
+# pyplotで図の構成を作成
+fig = plt.figure(figsize=(24, 16))
+plt.imshow(img)
+plt.axis('off')
 plt.tight_layout()
 
-st.subheader('Generative Pokemon Images')
+# アプリ上で画像を表示
+st.subheader('Generative Pokémon Images')
 st.pyplot()
+

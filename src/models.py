@@ -210,7 +210,7 @@ class Discriminator_sagan(nn.Module):
             nn.LeakyReLU(0.1, inplace=True)
         )
 
-        self.layer4 = nn.Sequential(
+        self.layer5 = nn.Sequential(
             nn.utils.spectral_norm(nn.Conv2d(image_size*4, image_size*8, kernel_size=4, stride=2, padding=1)),
             nn.LeakyReLU(0.1, inplace=True)
         )
@@ -226,7 +226,7 @@ class Discriminator_sagan(nn.Module):
         out, attention_map1 = self.self_attention1(out)
         out = self.layer4(out)
         out = self.layer5(out)
-        out, attention_map2 = self.self_attention3(out)
+        out, attention_map2 = self.self_attention2(out)
         out = self.last(out)
 
         return out

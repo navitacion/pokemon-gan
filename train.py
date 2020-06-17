@@ -7,8 +7,8 @@ from src import utils, models, trainer
 # Parser  ################################################################
 parser = argparse.ArgumentParser()
 parser.add_argument('-b', '--batch_size', type=int, default=32)
-parser.add_argument('-img_s', '--image_size', type=int, default=256)
-parser.add_argument('-epoch', '--epoch', type=int, default=10001)
+parser.add_argument('-img_s', '--image_size', type=int, default=128)
+parser.add_argument('-epoch', '--epoch', type=int, default=5001)
 parser.add_argument('-gan', '--gan_type', choices=['DCGAN', 'SAGAN'], default='SAGAN')
 parser.add_argument('-exp', '--exp_name')
 parser.add_argument('-s_epoch', '--save_weight_epoch', type=int, default=100)
@@ -19,7 +19,7 @@ args = parser.parse_args()
 MEAN = (0.5,)
 STD = (0.5,)
 EPOCHS = args.epoch
-Z_DIM = 100
+Z_DIM = 400
 BATCHSIZE = args.batch_size
 IMGSIZE = args.image_size
 

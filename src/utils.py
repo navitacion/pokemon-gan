@@ -31,8 +31,7 @@ class ImageTransform:
     def __init__(self, img_size, mean, std):
         self.transform = transforms.Compose([
             transforms.Resize((img_size, img_size)),
-            transforms.RandomHorizontalFlip(),
-            transforms.RandomVerticalFlip(),
+            transforms.CenterCrop(img_size),
             transforms.ToTensor(),
             transforms.Normalize(mean, std)
         ])

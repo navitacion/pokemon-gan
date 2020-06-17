@@ -5,7 +5,7 @@ import streamlit as st
 from src import models
 
 
-Z_DIM = 100
+Z_DIM = 400
 
 @st.cache
 def model_init(weight_path, exp):

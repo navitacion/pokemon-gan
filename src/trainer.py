@@ -22,7 +22,7 @@ def train_model(G, D, dataloader, z_dim, num_epochs, save_weights_path, exp='DCG
     writer = SummaryWriter(os.path.join(tensorboard_path, exp))
 
     # 最適化手法の設定
-    g_lr, d_lr = 0.0001, 0.0004
+    g_lr, d_lr = 0.0002, 0.0002
     beta1, beta2 = 0.0, 0.9
     g_optimizer = torch.optim.Adam(G.parameters(), g_lr, (beta1, beta2))
     d_optimizer = torch.optim.Adam(D.parameters(), d_lr, (beta1, beta2))

@@ -33,8 +33,8 @@ if args.gan_type == 'DCGAN':
     G = models.Generator_dcgan(z_dim=Z_DIM, image_size=64, out_channel=3)
     D = models.Discriminator_dcgan(image_size=64, in_channel=3)
 elif args.gan_type == 'SAGAN':
-    G = models.Generator_sagan(z_dim=Z_DIM, image_size=64, out_channel=3)
-    D = models.Discriminator_sagan(image_size=64, in_channel=3)
+    G = models.Generator_sagan(z_dim=Z_DIM, image_size=48, out_channel=3)
+    D = models.Discriminator_sagan(image_size=48, in_channel=3)
 
 G.apply(utils.weights_init)
 D.apply(utils.weights_init)

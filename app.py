@@ -34,7 +34,7 @@ def model_init(weight_path, exp):
     if 'DCGAN' in exp:
         G = models.Generator_dcgan(z_dim=Z_DIM, image_size=64, out_channel=3)
     elif 'SAGAN' in exp:
-        G = models.Generator_sagan(z_dim=Z_DIM, image_size=64, out_channel=3)
+        G = models.Generator_sagan(z_dim=Z_DIM, image_size=48, out_channel=3)
     G.load_state_dict(torch.load(weight_path, map_location=device))
 
     return G

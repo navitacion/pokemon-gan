@@ -16,11 +16,11 @@ MacあるいはLinuxであること
 [Pokemon Images Dataset | Kaggle](https://www.kaggle.com/kvpratama/pokemon-images-dataset)
 
 ## 仕様
-出力画像：グレースケール；64×64
+出力画像：RGB；128×128
 
 モデル：DCGAN, SAGAN
 
-WebアプリではEpoch数0 ~ 5,000回の結果を500ごとに表示できるようにしています。
+WebアプリではEpoch数0 ~ 1,000回の結果を20ごとに表示できるようにしています。
 
 ## 利用方法
 

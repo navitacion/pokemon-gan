@@ -53,7 +53,7 @@ def train_model(G, D, dataloader, z_dim, num_epochs, save_weights_path='./weight
     if gan_type == 'DCGAN':
         g_lr, d_lr = 0.0002, 0.0002
     elif gan_type == 'SAGAN':
-        g_lr, d_lr = 0.0001, 0.0004
+        g_lr, d_lr = 0.0001, 0.0002
     beta1, beta2 = 0.0, 0.9
     g_optimizer = torch.optim.Adam(G.parameters(), g_lr, (beta1, beta2))
     d_optimizer = torch.optim.Adam(D.parameters(), d_lr, (beta1, beta2))
@@ -166,6 +166,6 @@ def train_model(G, D, dataloader, z_dim, num_epochs, save_weights_path='./weight
         writer.add_scalar('loss/netG', G_loss, epoch)
 
         # save_weight_epochで定義したタイミングでモデルの重みを保存
+        # 生成モデルのみの重みを保存する
         if epoch % save_weight_epoch == 0:
             torch.save(G.state_dict(), os.path.join(save_weights_path, f'{gan_type}_netG_epoch_{epoch}.pth'))
-            torch.save(D.state_dict(), os.path.join(save_weights_path, f'{gan_type}_netD_epoch_{epoch}.pth'))

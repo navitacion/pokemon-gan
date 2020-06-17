@@ -36,6 +36,7 @@ def model_init(weight_path, exp):
     elif 'SAGAN' in exp:
         G = models.Generator_sagan(z_dim=Z_DIM, image_size=48, out_channel=3)
     G.load_state_dict(torch.load(weight_path, map_location=device))
+    G.eval()
 
     return G
 
@@ -46,9 +47,8 @@ st.markdown('---')
 st.markdown('This app is a demo of GAN using Pokémon images.')
 st.markdown('In this demo, the DCGAN and SAGAN models can be used to generate images.')
 st.markdown('By selecting the type of model and the number of training epochs, '
-            'you can select the model and the degree of training '
-            'according to the You can see the results of the GAN output.')
-st.markdown('Enjoy!!!')
+            'you can see the results of the Generative Images from GAN.')
+st.markdown('Maybe, you can find a new Pokémon...   Enjoy!!')
 st.markdown('---')
 
 # スライドバーの設定
@@ -62,14 +62,14 @@ G = model_init(weight_path, exp)
 
 # 画像生成
 z = torch.randn(OUTPUT_IMAGE_NUM, Z_DIM, 1, 1)
-out = G(z)
+with torch.no_grad():
+    out = G(z)
 
 # 複数画像を一つに結合
 img = vutils.make_grid(out.detach().cpu(), normalize=True, padding=2, nrow=5, pad_value=1)
 img = np.transpose(img.numpy(), [1, 2, 0])
 
 # pyplotで図の構成を作成
-fig = plt.figure(figsize=(24, 16))
 plt.imshow(img)
 plt.axis('off')
 plt.tight_layout()

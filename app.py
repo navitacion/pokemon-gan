@@ -59,11 +59,12 @@ epoch = st.sidebar.slider('Select Epoch', min_value=0, max_value=1000, step=20)
 # モデルの準備
 weight_path = f'./weights/{exp}_netG_epoch_{epoch}.pth'
 G = model_init(weight_path, exp)
+G = G.to(device)
 
 # 画像生成
 z = torch.randn(OUTPUT_IMAGE_NUM, Z_DIM, 1, 1)
 with torch.no_grad():
-    out = G(z)
+    out = G(z.to(device))
 
 # 複数画像を一つに結合
 img = vutils.make_grid(out.detach().cpu(), normalize=True, padding=2, nrow=5, pad_value=1)

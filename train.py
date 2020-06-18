@@ -10,7 +10,7 @@ parser.add_argument('-b', '--batch_size', type=int, default=32)
 parser.add_argument('-img_s', '--image_size', type=int, default=128)
 parser.add_argument('-epoch', '--epoch', type=int, default=1001)
 parser.add_argument('-gan', '--gan_type', choices=['DCGAN', 'SAGAN'], default='SAGAN')
-parser.add_argument('-s_epoch', '--save_weight_epoch', type=int, default=100)
+parser.add_argument('-s_epoch', '--save_weight_epoch', type=int, default=40)
 
 args = parser.parse_args()
 

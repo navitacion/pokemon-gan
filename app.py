@@ -54,7 +54,7 @@ st.markdown('---')
 # スライドバーの設定
 st.sidebar.subheader('Setup')
 exp = st.sidebar.selectbox('Select GAN', ('DCGAN', 'SAGAN'))
-epoch = st.sidebar.slider('Select Epoch', min_value=0, max_value=1000, step=20)
+epoch = st.sidebar.slider('Select Epoch', min_value=0, max_value=1000, step=40)
 
 # モデルの準備
 weight_path = f'./weights/{exp}_netG_epoch_{epoch}.pth'

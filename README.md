@@ -30,9 +30,9 @@ WebアプリではEpoch数0 ~ 1,000回の結果を40ごとに表示できるよ�
 
 ```
 poetry install
-
+# pipのアップグレード
 poetry run pip install --upgrade pip
-
+# setuptoolsのアップグレード
 poetry run pip install setuptools==41.0.0
 ```
 

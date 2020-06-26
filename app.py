@@ -51,7 +51,7 @@ st.markdown('By selecting the type of model and the number of training epochs, '
 st.markdown('Maybe, you can find a new Pokémon...   Enjoy!!')
 st.markdown('---')
 
-# セットアップの定義
+# スライドバーの設定
 st.sidebar.subheader('Setup')
 exp = st.sidebar.selectbox('Select GAN', ('DCGAN', 'SAGAN'))
 epoch = st.sidebar.slider('Select Epoch', min_value=0, max_value=1000, step=40)

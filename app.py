@@ -71,11 +71,11 @@ img = vutils.make_grid(out.detach().cpu(), normalize=True, padding=2, nrow=5, pa
 img = np.transpose(img.numpy(), [1, 2, 0])
 
 # pyplotで図の構成を作成
-plt.imshow(img)
-plt.axis('off')
-plt.tight_layout()
+fig, ax = plt.subplots()
+ax.imshow(img)
+ax.axis('off')
 
 # アプリ上で画像を表示
 st.subheader('Generative Pokémon Images')
-st.pyplot()
+st.pyplot(fig)
 
